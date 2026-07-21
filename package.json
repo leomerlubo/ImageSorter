@@ -1,0 +1,18 @@
+{
+  "name": "park-avenue-image-sorter",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "check": "node --check api/rpc.js && node --check lib/firebase-admin.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.4.0"
+  },
+  "devDependencies": {
+    "vercel": "^46.0.0"
+  }
+}
