@@ -823,6 +823,29 @@
       text-align: right;
     }
 
+    .importDrop {
+      display: block;
+      width: 100%;
+      padding: 24px 16px;
+      border: 2px dashed #93c5fd;
+      border-radius: 18px;
+      background: #eff6ff;
+      color: #1e40af;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .importResult {
+      min-height: 22px;
+      margin-top: 12px;
+      color: #334155;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
     @media (max-width: 1100px) {
       .top {
         align-items: stretch;
@@ -908,6 +931,7 @@
       <button class="navBtn success" onclick="confirmSaveExit()"><span class="btnIcon">✓</span>Save Exit</button>
       <button class="navBtn primary" onclick="openProgress()"><span class="btnIcon">▦</span>Progress</button>
       <button class="navBtn purple" onclick="exportCsv()"><span class="btnIcon">⇩</span>Export CSV</button>
+      <button class="navBtn" id="importBtn" style="display:none" onclick="openImport()"><span class="btnIcon">⇧</span>Import SKUs</button>
       <button class="iconBtn" title="Settings" onclick="openSettings()">⚙️</button>
       <button class="navBtn danger" onclick="signOutUser()">Sign Out</button>
     </div>
@@ -936,6 +960,21 @@
     <div class="modalSub" id="progressSummary">Loading progress...</div>
     <div id="progressTableWrap"></div>
     <button class="closeBtn" onclick="closeProgress()">Close</button>
+  </div>
+</div>
+
+<div class="modal" id="importModal">
+  <div class="modalContent wideModal">
+    <div class="modalTitle">Import More SKUs</div>
+    <div class="modalSub">Upload a CSV containing SKU, Description, and Image 1 through Image 31. Existing SKUs will be skipped.</div>
+    <button class="navBtn primary" onclick="downloadImportTemplate()">Download CSV Template</button>
+    <label class="importDrop" for="importFile" style="margin-top:14px">
+      Choose CSV File
+      <input id="importFile" type="file" accept=".csv,text/csv" style="display:none" onchange="prepareImport(this.files[0])">
+    </label>
+    <div class="importResult" id="importResult">Download the template, add your SKUs and image links, then upload it here.</div>
+    <button class="saveBtn" id="importStartBtn" onclick="startImport()" disabled>Import SKUs</button>
+    <button class="closeBtn" onclick="closeImport()">Close</button>
   </div>
 </div>
 
@@ -1181,6 +1220,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
+const MASTER_EMAIL = 'leomer@parkaveappliance.com';
 
 // Compatibility bridge for the original Apps Script client calls.
 // It preserves google.script.run's chained success and failure handler API.
@@ -1258,6 +1298,7 @@ let confirmCallback = null;
 let batchDeadlineAt = null;
 let batchTimerInterval = null;
 let autoSaveExitRunning = false;
+let pendingImportRows = [];
 
 const MINUTES_PER_TASK = 2;
 
@@ -1290,6 +1331,7 @@ auth.onAuthStateChanged(user => {
     document.getElementById('nextBtn').style.display = 'block';
     document.getElementById('userBox').textContent = signedInEmail;
     document.getElementById('userAvatar').textContent = signedInEmail.charAt(0).toUpperCase();
+    document.getElementById('importBtn').style.display = signedInEmail === MASTER_EMAIL ? 'inline-flex' : 'none';
 
     startAppAfterLogin();
   } else {
@@ -2195,6 +2237,129 @@ function openProgress() {
 
 function closeProgress() {
   document.getElementById('progressModal').style.display = 'none';
+}
+
+function openImport() {
+  if (signedInEmail !== MASTER_EMAIL) return;
+  pendingImportRows = [];
+  document.getElementById('importFile').value = '';
+  document.getElementById('importStartBtn').disabled = true;
+  document.getElementById('importResult').textContent = 'Download the template, add your SKUs and image links, then upload it here.';
+  document.getElementById('importModal').style.display = 'flex';
+}
+
+function closeImport() {
+  document.getElementById('importModal').style.display = 'none';
+}
+
+function downloadImportTemplate() {
+  const headers = ['SKU', 'Description'];
+  for (let i = 1; i <= 31; i++) headers.push('Image ' + i);
+  const example = ['EXAMPLE-SKU', 'Example product', 'https://example.com/image-1.jpg', 'https://example.com/image-2.jpg'];
+  while (example.length < headers.length) example.push('');
+  downloadTextFile(headers.join(',') + '\r\n' + example.join(',') + '\r\n', 'image_sorter_import_template.csv');
+}
+
+function downloadTextFile(text, filename) {
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8;' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let quoted = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (quoted) {
+      if (char === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (char === '"') quoted = false;
+      else cell += char;
+    } else if (char === '"') quoted = true;
+    else if (char === ',') { row.push(cell); cell = ''; }
+    else if (char === '\n') { row.push(cell.replace(/\r$/, '')); rows.push(row); row = []; cell = ''; }
+    else cell += char;
+  }
+
+  if (cell || row.length) { row.push(cell.replace(/\r$/, '')); rows.push(row); }
+  return rows;
+}
+
+function prepareImport(file) {
+  pendingImportRows = [];
+  document.getElementById('importStartBtn').disabled = true;
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function() {
+    try {
+      const csvRows = parseCsv(String(reader.result || '').replace(/^\uFEFF/, ''));
+      if (!csvRows.length) throw new Error('The CSV is empty.');
+      const headers = csvRows[0].map(value => String(value).trim().toLowerCase());
+      const skuIndex = headers.indexOf('sku');
+      const descriptionIndex = headers.indexOf('description');
+      const imageIndexes = headers.map((value, index) => /^image\s+\d+$/.test(value) ? index : -1).filter(index => index >= 0);
+      if (skuIndex < 0 || imageIndexes.length < 2) throw new Error('Required headers are missing. Please use the downloadable template.');
+
+      pendingImportRows = csvRows.slice(1).map(columns => ({
+        sku: String(columns[skuIndex] || '').trim(),
+        description: descriptionIndex >= 0 ? String(columns[descriptionIndex] || '').trim() : '',
+        images: imageIndexes.map(index => String(columns[index] || '').trim()).filter(Boolean)
+      })).filter(row => row.sku || row.images.length);
+
+      document.getElementById('importResult').textContent = pendingImportRows.length + ' row(s) ready to validate and import.';
+      document.getElementById('importStartBtn').disabled = !pendingImportRows.length;
+    } catch (error) {
+      document.getElementById('importResult').textContent = error.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function callServer(action, args) {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Sign in is required.');
+  const response = await fetch('/api/rpc', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await user.getIdToken() },
+    body: JSON.stringify({ action, args })
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.error || 'Server request failed.');
+  return payload.result;
+}
+
+async function startImport() {
+  if (signedInEmail !== MASTER_EMAIL || !pendingImportRows.length) return;
+  const button = document.getElementById('importStartBtn');
+  button.disabled = true;
+  let imported = 0;
+  let duplicates = 0;
+  let invalid = 0;
+
+  try {
+    for (let offset = 0; offset < pendingImportRows.length; offset += 200) {
+      document.getElementById('importResult').textContent = 'Importing rows ' + (offset + 1) + ' through ' + Math.min(offset + 200, pendingImportRows.length) + '...';
+      const result = await callServer('importTasks', [pendingImportRows.slice(offset, offset + 200)]);
+      imported += Number(result.imported || 0);
+      duplicates += Number(result.duplicates || 0);
+      invalid += Number(result.invalid || 0);
+    }
+    pendingImportRows = [];
+    document.getElementById('importResult').textContent = 'Import complete: ' + imported + ' added, ' + duplicates + ' existing SKUs skipped, ' + invalid + ' invalid rows skipped.';
+    preloadQueue = [];
+  } catch (error) {
+    document.getElementById('importResult').textContent = 'Import failed: ' + simplifyError(error);
+    button.disabled = false;
+  }
 }
 
 function renderProgress(summary) {
