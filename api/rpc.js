@@ -9,6 +9,8 @@ const CONFIG = {
   userStatsCollection: 'userStats'
 };
 
+const MASTER_EMAIL = 'leomer@parkaveappliance.com';
+
 function normalizeEmail(value) {
   return String(value || '').trim().toLowerCase();
 }
@@ -212,7 +214,82 @@ async function exportCompletedTasksCsv() {
   return rows.map(row => row.map(csvCell).join(',')).join('\n');
 }
 
-const actions = { getNextBatch, saveBatchResults, releaseSessionLocks, getProgressReport, exportCompletedTasksCsv };
+async function importTasks(args, user) {
+  if (user.email !== MASTER_EMAIL) {
+    throw Object.assign(new Error('Only the administrator can import SKUs.'), { status: 403 });
+  }
+
+  const rows = Array.isArray(args[0]) ? args[0].slice(0, 200) : [];
+  const validRows = [];
+  let invalid = 0;
+  const seen = new Set();
+
+  for (const row of rows) {
+    const sku = String(row?.sku || '').trim();
+    const description = String(row?.description || '').trim();
+    const images = Array.isArray(row?.images)
+      ? [...new Set(row.images.map(value => String(value || '').trim()).filter(Boolean))].slice(0, 31)
+      : [];
+
+    if (!sku || sku.toLowerCase() === 'placeholder' || sku.includes('/') || images.length < 2 || seen.has(sku)) {
+      invalid++;
+      continue;
+    }
+
+    seen.add(sku);
+    validRows.push({ sku, description, images });
+  }
+
+  if (!validRows.length) return { imported: 0, duplicates: 0, invalid };
+
+  const db = getDb();
+  const refs = validRows.map(row => db.collection(CONFIG.taskCollection).doc(row.sku));
+  const settingsRef = db.collection(CONFIG.settingsCollection).doc(CONFIG.settingsDoc);
+  let imported = 0;
+  let duplicates = 0;
+
+  await db.runTransaction(async tx => {
+    const snapshots = await tx.getAll(...refs, settingsRef);
+    const taskSnapshots = snapshots.slice(0, refs.length);
+    const settingsSnapshot = snapshots[refs.length];
+    const now = new Date();
+
+    taskSnapshots.forEach((snapshot, index) => {
+      if (snapshot.exists) {
+        duplicates++;
+        return;
+      }
+
+      const row = validRows[index];
+      tx.create(refs[index], {
+        sku: row.sku,
+        description: row.description,
+        images: row.images,
+        status: 'available',
+        lockedByEmail: '',
+        lockedAt: null,
+        expiresAt: null,
+        completedByEmail: '',
+        completedAt: null,
+        selectedImages: [],
+        skipped: false,
+        importedByEmail: user.email,
+        importedAt: now
+      });
+      imported++;
+    });
+
+    if (imported) {
+      const current = settingsSnapshot.exists ? settingsSnapshot.data() : {};
+      const currentTotal = Number(current.totalSkus || CONFIG.totalSkus);
+      tx.set(settingsRef, { totalSkus: currentTotal + imported }, { merge: true });
+    }
+  });
+
+  return { imported, duplicates, invalid };
+}
+
+const actions = { getNextBatch, saveBatchResults, releaseSessionLocks, getProgressReport, exportCompletedTasksCsv, importTasks };
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed.' });
