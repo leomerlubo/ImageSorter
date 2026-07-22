@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bgColor: #f4f6f8;
+      --imageWidth: 120px;
+      --imageHeight: 70px;
+      --cardColorOdd: #ffffff;
+      --cardColorEven: #f8fafc;
+      --textMain: #0f172a;
+      --textMuted: #64748b;
+      --lineSoft: rgba(148, 163, 184, 0.22);
+      --navBg: rgba(255, 255, 255, 0.78);
+      --shadowSoft: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bgColor);
+      color: var(--textMain);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    .authScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .authCard {
+      width: 430px;
+      background: rgba(255, 255, 255, .96);
+      border-radius: 30px;
+      padding: 28px;
+      box-shadow: var(--shadowSoft);
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, .78);
+    }
+
+    .authTitle {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--textMain);
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .authSub {
+      font-size: 14px;
+      color: var(--textMuted);
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .googleBtn {
+      width: 100%;
+      border: none;
+      padding: 15px;
+      border-radius: 18px;
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      background: #2563eb;
+      box-shadow: 0 10px 24px rgba(37,99,235,.22);
+    }
+
+    .container {
+      display: none;
+      width: 100%;
+      max-width: none;
+      padding: 22px 40px 120px 40px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .top {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 28px;
+      padding: 12px;
+      background: var(--navBg);
+      border: 1px solid var(--lineSoft);
+      border-radius: 28px;
+      box-shadow: var(--shadowSoft);
+      backdrop-filter: blur(18px);
+    }
+
+    .topLeft {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brandMark {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      font-weight: 800;
+      flex-shrink: 0;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, .20);
+    }
+
+    .brandText {
+      text-align: left;
+      min-width: 0;
+    }
+
+    .brandTitle {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--textMain);
+      white-space: nowrap;
+    }
+
+    .brandSub {
+      margin-top: 3px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--textMuted);
+      white-space: nowrap;
+    }
+
+    .topActions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 2px;
+    }
+
+    .topActions::-webkit-scrollbar {
+      height: 0;
+    }
+
+    .topRight {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      min-width: 230px;
+      max-width: 340px;
+      flex-shrink: 0;
+    }
+
+    .userPill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      background: #f8fafc;
+      border: 1px solid var(--lineSoft);
+      border-radius: 18px;
+      padding: 9px 12px;
+    }
+
+    .userAvatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      background: #e0f2fe;
+      color: #0369a1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .userText {
+      min-width: 0;
+      text-align: left;
+    }
+
+    .signedInLabel {
+      font-size: 11px;
+      color: var(--textMuted);
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .signedInEmail {
+      margin-top: 2px;
+      font-size: 12px;
+      color: #334155;
+      font-weight: 800;
+      line-height: 1.2;
+      max-width: 230px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .navBtn,
+    .iconBtn,
+    .skipBtn {
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
+      transition: 0.16s ease;
+      flex-shrink: 0;
+    }
+
+    .navBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid var(--lineSoft);
+    }
+
+    .navBtn:hover,
+    .iconBtn:hover {
+      transform: translateY(-1px);
+      background: #ffffff;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, .08);
+    }
+
+    .navBtn.primary {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+      box-shadow: 0 10px 24px rgba(37,99,235,.18);
+    }
+
+    .navBtn.success {
+      background: #0f766e;
+      color: white;
+      border-color: #0f766e;
+      box-shadow: 0 10px 24px rgba(15,118,110,.16);
+    }
+
+    .navBtn.purple {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+      box-shadow: 0 10px 24px rgba(124,58,237,.16);
+    }
+
+    .navBtn.danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .iconBtn {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid var(--lineSoft);
+      font-size: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btnIcon {
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .status {
+      font-size: 14px;
+      color: var(--textMuted);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .batchTimer {
+      display: none;
+      width: fit-content;
+      margin: 0 auto 18px auto;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 14px;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(37,99,235,.10);
+    }
+
+    .batchTimer.warning {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+
+    .batchTimer.danger {
+      background: #fef2f2;
+      color: #b42318;
+    }
+
+    .taskList {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .taskCard {
+      background: var(--cardColorOdd);
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(15,23,42,.04), 0 12px 28px rgba(15,23,42,.05);
+      text-align: left;
+      border: 1px solid rgba(255,255,255,.65);
+    }
+
+    .taskCard.alt {
+      background: var(--cardColorEven);
+    }
+
+    .taskTop {
+      display: grid;
+      grid-template-columns: 44px 1fr 90px;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .taskNumber {
+      font-size: 24px;
+      font-weight: 800;
+      color: #2563eb;
+      text-align: center;
+    }
+
+    .skuLine {
+      font-size: 18px;
+      line-height: 1.45;
+      word-break: break-word;
+      color: var(--textMain);
+    }
+
+    .skuText {
+      font-weight: 800;
+      color: var(--textMain);
+    }
+
+    .descText {
+      color: #334155;
+      font-weight: 500;
+    }
+
+    .skipBtn {
+      padding: 11px 14px;
+      border-radius: 14px;
+      background: #64748b;
+      color: white;
+      font-size: 14px;
+    }
+
+    .skipBtn.skipped {
+      background: #b42318;
+    }
+
+    .images {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, var(--imageWidth));
+      gap: 12px;
+      padding-left: 56px;
+      padding-right: 10px;
+      align-items: center;
+    }
+
+    .imgBox {
+      position: relative;
+      width: var(--imageWidth);
+      height: var(--imageHeight);
+      border: 2px solid transparent;
+      border-radius: 16px;
+      background: white;
+      cursor: pointer;
+      overflow: hidden;
+      transition: 0.16s ease;
+      box-shadow: 0 2px 6px rgba(15,23,42,.04), 0 8px 18px rgba(15,23,42,.06);
+    }
+
+    .imgBox.selected {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37,99,235,.12), 0 10px 22px rgba(37,99,235,.18);
+    }
+
+    .imgBox.disabled {
+      opacity: .35;
+      pointer-events: none;
+    }
+
+    .imgBox img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: #2563eb;
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 999px;
+    }
+
+    .nextFloating {
+      display: none;
+      position: fixed;
+      background: #2563eb;
+      color: white;
+      font-size: 24px;
+      font-weight: 800;
+      padding: 24px 38px;
+      border-radius: 24px;
+      cursor: pointer;
+      user-select: none;
+      z-index: 50;
+      transition: 0.18s ease;
+      box-shadow: 0 10px 24px rgba(37,99,235,.28), 0 20px 48px rgba(37,99,235,.18);
+    }
+
+    .nextFloating:hover {
+      background: #1d4ed8;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.38);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      backdrop-filter: blur(10px);
+    }
+
+    .modalContent {
+      background: rgba(255,255,255,.96);
+      width: 430px;
+      border-radius: 30px;
+      padding: 24px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(15,23,42,.18);
+    }
+
+    .wideModal {
+      width: 720px;
+      max-width: calc(100vw - 24px);
+    }
+
+    .confirmContent {
+      width: 390px;
+      text-align: left;
+    }
+
+    .confirmIcon {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: #eff6ff;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 23px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .confirmActions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .confirmCancel,
+    .confirmGo {
+      border: none;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .confirmCancel {
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .confirmGo {
+      background: #2563eb;
+      color: white;
+    }
+
+    .confirmGo.exit {
+      background: #0f766e;
+    }
+
+    .modalTitle {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: var(--textMain);
+      letter-spacing: -0.03em;
+    }
+
+    .modalSub {
+      font-size: 14px;
+      color: var(--textMuted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .settingMenuList {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .settingMenuItem {
+      display: grid;
+      grid-template-columns: 42px 1fr 24px;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 14px;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.15s ease;
+    }
+
+    .settingMenuItem:hover {
+      background: white;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+
+    .settingMenuIcon {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      background: #eff6ff;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .settingMenuTitle {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--textMain);
+      margin-bottom: 3px;
+    }
+
+    .settingMenuDesc {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--textMuted);
+      line-height: 1.35;
+    }
+
+    .settingMenuArrow {
+      color: #94a3b8;
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .backBtn {
+      width: 100%;
+      border: none;
+      padding: 13px;
+      border-radius: 16px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .settingRow {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .settingLabel {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1e293b;
+    }
+
+    .settingSelect,
+    .textInput {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 16px;
+      border: 1px solid #dbe3ef;
+      font-size: 15px;
+      background: #f8fafc;
+      outline: none;
+      font-weight: 500;
+    }
+
+    .textInput:focus,
+    .settingSelect:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+      background: white;
+    }
+
+    .swatchGrid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .swatch {
+      height: 40px;
+      border-radius: 16px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .swatch.active {
+      border-color: var(--textMain);
+      box-shadow: 0 0 0 4px rgba(15,23,42,.08);
+    }
+
+    .colorPreviewRow {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .colorPreview {
+      height: 48px;
+      border-radius: 16px;
+      border: 1px solid #dbe3ef;
+      background: var(--bgColor);
+    }
+
+    .paletteGrid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .paletteOption {
+      display: grid;
+      grid-template-columns: 1fr 64px 64px;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #dbe3ef;
+      border-radius: 16px;
+      background: #f8fafc;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      color: #334155;
+      text-align: left;
+    }
+
+    .paletteOption.active {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37,99,235,.10);
+      background: white;
+    }
+
+    .paletteSwatch {
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(15,23,42,.08);
+    }
+
+    .positionGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .positionBtn {
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid #dbe3ef;
+      background: #f8fafc;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      transition: 0.15s ease;
+    }
+
+    .positionBtn.active {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+      box-shadow: 0 8px 18px rgba(37,99,235,.22);
+    }
+
+    .saveBtn,
+    .closeBtn {
+      width: 100%;
+      border: none;
+      padding: 15px;
+      border-radius: 18px;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.18s ease;
+    }
+
+    .saveBtn {
+      background: #2563eb;
+      box-shadow: 0 10px 24px rgba(37,99,235,.22);
+    }
+
+    .saveBtn:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .closeBtn {
+      background: #475569;
+    }
+
+    .empty {
+      background: white;
+      border-radius: 24px;
+      padding: 40px;
+      color: #555;
+      font-weight: 600;
+    }
+
+    .loading {
+      opacity: .6;
+      pointer-events: none;
+    }
+
+    .progressTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .progressTable th,
+    .progressTable td {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 10px;
+      text-align: left;
+    }
+
+    .progressTable th {
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 800;
+    }
+
+    .progressTable td {
+      color: var(--textMain);
+      font-weight: 600;
+    }
+
+    .progressTable .num {
+      text-align: right;
+    }
+
+    @media (max-width: 1100px) {
+      .top {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .topRight {
+        justify-content: flex-start;
+        max-width: none;
+        min-width: 0;
+      }
+
+      .signedInEmail {
+        max-width: calc(100vw - 140px);
+      }
+    }
+
+    @media (max-width: 700px) {
+      .container {
+        padding: 14px 12px 120px 12px;
+      }
+
+      .topActions {
+        width: 100%;
+      }
+
+      .brandTitle,
+      .brandSub {
+        white-space: normal;
+      }
+
+      .navBtn {
+        padding: 0 12px;
+      }
+
+      .images {
+        grid-template-columns: repeat(auto-fit, minmax(var(--imageWidth), 1fr));
+        padding-left: 42px;
+        padding-right: 0;
+      }
+
+      .imgBox {
+        width: 100%;
+      }
+
+      .modalContent,
+      .wideModal {
+        width: calc(100vw - 24px);
+      }
+
+      .nextFloating {
+        padding: 20px 32px;
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="authScreen" id="authScreen">
+  <div class="authCard">
+    <div class="authTitle">Image Sorter Task</div>
+    <div class="authSub">
+      Help us sort the first two images for each product on the Park Avenue website 
+    </div>
+    <button class="googleBtn" onclick="signInWithGoogle()">Sign in with Google</button>
+  </div>
+</div>
+
+<div class="container" id="appContainer">
+  <div class="top">
+    <div class="topLeft">
+      <div class="brandMark">PA</div>
+      <div class="brandText">
+        <div class="brandTitle">Image Sorter</div>
+        <div class="brandSub">Park Avenue Appliance</div>
+      </div>
+    </div>
+
+    <div class="topActions">
+      <button class="navBtn" onclick="confirmRefresh()"><span class="btnIcon">↻</span>Refresh</button>
+      <button class="navBtn success" onclick="confirmSaveExit()"><span class="btnIcon">✓</span>Save Exit</button>
+      <button class="navBtn primary" onclick="openProgress()"><span class="btnIcon">▦</span>Progress</button>
+      <button class="navBtn purple" onclick="exportCsv()"><span class="btnIcon">⇩</span>Export CSV</button>
+      <button class="iconBtn" title="Settings" onclick="openSettings()">⚙️</button>
+      <button class="navBtn danger" onclick="signOutUser()">Sign Out</button>
+    </div>
+
+    <div class="topRight">
+      <div class="userPill">
+        <div class="userAvatar" id="userAvatar">U</div>
+        <div class="userText">
+          <div class="signedInLabel">Signed in as</div>
+          <div class="signedInEmail" id="userBox"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status" id="status"></div>
+  <div class="batchTimer" id="batchTimer"></div>
+  <div id="taskList" class="taskList"></div>
+</div>
+
+<div class="nextFloating" id="nextBtn" onclick="saveAndNext()">Next</div>
+
+<div class="modal" id="progressModal">
+  <div class="modalContent wideModal">
+    <div class="modalTitle">Progress Report</div>
+    <div class="modalSub" id="progressSummary">Loading progress...</div>
+    <div id="progressTableWrap"></div>
+    <button class="closeBtn" onclick="closeProgress()">Close</button>
+  </div>
+</div>
+
+<div class="modal" id="loadModal">
+  <div class="modalContent">
+    <div class="modalTitle">Load Tasks</div>
+    <div class="modalSub">Choose how many tasks to load now and how many to preload next. Each loaded task gets 2 minutes before automatic save exit.</div>
+
+    <div class="settingRow">
+      <div class="settingLabel">Tasks to Load</div>
+      <input id="loadCountInput" class="textInput" type="number" min="1" step="1" placeholder="Example: 50" oninput="validateLoadInputs()">
+    </div>
+
+    <div class="settingRow">
+      <div class="settingLabel">Tasks to Preload</div>
+      <input id="preloadCountInput" class="textInput" type="number" min="1" step="1" placeholder="Example: 100" oninput="validateLoadInputs()">
+    </div>
+
+    <button id="loadStartBtn" class="saveBtn" onclick="confirmLoadPrompt()" disabled>Load Tasks</button>
+  </div>
+</div>
+
+<div class="modal" id="confirmModal">
+  <div class="modalContent confirmContent">
+    <div class="confirmIcon" id="confirmIcon">?</div>
+    <div class="modalTitle" id="confirmTitle">Confirm</div>
+    <div class="modalSub" id="confirmMessage">Please confirm this action.</div>
+
+    <div class="confirmActions">
+      <button class="confirmCancel" onclick="closeConfirm()">Cancel</button>
+      <button class="confirmGo" id="confirmActionBtn">Continue</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="settingsModal">
+  <div class="modalContent">
+    <div class="modalTitle">Settings</div>
+    <div class="modalSub">Choose a setting to customize.</div>
+
+    <div class="settingMenuList">
+      <button class="settingMenuItem" onclick="openSettingsPanel('taskSettingsModal')">
+        <div class="settingMenuIcon">#</div>
+        <div>
+          <div class="settingMenuTitle">Task Loading</div>
+          <div class="settingMenuDesc">Visible tasks and preload amount.</div>
+        </div>
+        <div class="settingMenuArrow">›</div>
+      </button>
+
+      <button class="settingMenuItem" onclick="openSettingsPanel('backgroundSettingsModal')">
+        <div class="settingMenuIcon">🎨</div>
+        <div>
+          <div class="settingMenuTitle">App Background</div>
+          <div class="settingMenuDesc">Change the main app background color.</div>
+        </div>
+        <div class="settingMenuArrow">›</div>
+      </button>
+
+      <button class="settingMenuItem" onclick="openSettingsPanel('imageSettingsModal')">
+        <div class="settingMenuIcon">▣</div>
+        <div>
+          <div class="settingMenuTitle">Image Size</div>
+          <div class="settingMenuDesc">Tiny, small, medium, large, or extra large.</div>
+        </div>
+        <div class="settingMenuArrow">›</div>
+      </button>
+
+      <button class="settingMenuItem" onclick="openSettingsPanel('paletteSettingsModal')">
+        <div class="settingMenuIcon">◩</div>
+        <div>
+          <div class="settingMenuTitle">Alternating SKU Background</div>
+          <div class="settingMenuDesc">Choose soft matching row colors.</div>
+        </div>
+        <div class="settingMenuArrow">›</div>
+      </button>
+
+      <button class="settingMenuItem" onclick="openSettingsPanel('nextSettingsModal')">
+        <div class="settingMenuIcon">→</div>
+        <div>
+          <div class="settingMenuTitle">Next Button Position</div>
+          <div class="settingMenuDesc">Move the floating Next button.</div>
+        </div>
+        <div class="settingMenuArrow">›</div>
+      </button>
+    </div>
+
+    <button class="closeBtn" onclick="closeSettings()">Close</button>
+  </div>
+</div>
+
+<div class="modal" id="taskSettingsModal">
+  <div class="modalContent">
+    <div class="modalTitle">Task Loading</div>
+    <div class="modalSub">Set how many tasks are visible and how many are preloaded.</div>
+
+    <div class="settingRow">
+      <div class="settingLabel">Visible Tasks</div>
+      <select id="batchSizeSelect" class="settingSelect">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+        <option value="50">50</option>
+        <option value="60">60</option>
+        <option value="70">70</option>
+        <option value="80">80</option>
+        <option value="90">90</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+
+    <div class="settingRow">
+      <div class="settingLabel">Preload Tasks</div>
+      <select id="preloadSizeSelect" class="settingSelect">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+        <option value="50">50</option>
+        <option value="60">60</option>
+        <option value="70">70</option>
+        <option value="80">80</option>
+        <option value="90">90</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+
+    <button class="saveBtn" onclick="saveTaskSettings()">Save</button>
+    <button class="backBtn" onclick="backToSettingsMenu('taskSettingsModal')">Back</button>
+  </div>
+</div>
+
+<div class="modal" id="backgroundSettingsModal">
+  <div class="modalContent">
+    <div class="modalTitle">App Background</div>
+    <div class="modalSub">Choose a soft background color or enter your own HEX color.</div>
+
+    <div class="swatchGrid">
+      <button class="swatch" style="background:#f4f6f8" onclick="chooseColor('#f4f6f8', this)"></button>
+      <button class="swatch" style="background:#ffffff" onclick="chooseColor('#ffffff', this)"></button>
+      <button class="swatch" style="background:#eef2ff" onclick="chooseColor('#eef2ff', this)"></button>
+      <button class="swatch" style="background:#ecfeff" onclick="chooseColor('#ecfeff', this)"></button>
+      <button class="swatch" style="background:#f0fdf4" onclick="chooseColor('#f0fdf4', this)"></button>
+      <button class="swatch" style="background:#fff7ed" onclick="chooseColor('#fff7ed', this)"></button>
+      <button class="swatch" style="background:#fdf2f8" onclick="chooseColor('#fdf2f8', this)"></button>
+      <button class="swatch" style="background:#f8fafc" onclick="chooseColor('#f8fafc', this)"></button>
+      <button class="swatch" style="background:#e2e8f0" onclick="chooseColor('#e2e8f0', this)"></button>
+      <button class="swatch" style="background:#dbeafe" onclick="chooseColor('#dbeafe', this)"></button>
+      <button class="swatch" style="background:#dcfce7" onclick="chooseColor('#dcfce7', this)"></button>
+      <button class="swatch" style="background:#ffedd5" onclick="chooseColor('#ffedd5', this)"></button>
+    </div>
+
+    <div class="colorPreviewRow">
+      <div class="colorPreview" id="colorPreview"></div>
+      <input id="customColorInput" class="textInput" type="text" placeholder="#f4f6f8" oninput="handleCustomColorInput()">
+    </div>
+
+    <button class="saveBtn" onclick="saveBackgroundSettings()">Save</button>
+    <button class="backBtn" onclick="backToSettingsMenu('backgroundSettingsModal')">Back</button>
+  </div>
+</div>
+
+<div class="modal" id="imageSettingsModal">
+  <div class="modalContent">
+    <div class="modalTitle">Image Size</div>
+    <div class="modalSub">Change the size of all image thumbnails.</div>
+
+    <div class="settingRow">
+      <div class="settingLabel">Image Size</div>
+      <select id="imageSizeSelect" class="settingSelect">
+        <option value="tiny">Tiny</option>
+        <option value="small">Small</option>
+        <option value="medium">Medium</option>
+        <option value="large">Large</option>
+        <option value="xlarge">Extra Large</option>
+      </select>
+    </div>
+
+    <button class="saveBtn" onclick="saveImageSettings()">Save</button>
+    <button class="backBtn" onclick="backToSettingsMenu('imageSettingsModal')">Back</button>
+  </div>
+</div>
+
+<div class="modal" id="paletteSettingsModal">
+  <div class="modalContent">
+    <div class="modalTitle">Alternating SKU Background</div>
+    <div class="modalSub">Choose a soft paired color style for each SKU row.</div>
+
+    <div class="paletteGrid">
+      <button class="paletteOption" data-palette="clean" onclick="setCardPalette('clean', this)">Clean Slate<span class="paletteSwatch" style="background:#ffffff"></span><span class="paletteSwatch" style="background:#f8fafc"></span></button>
+      <button class="paletteOption" data-palette="blue" onclick="setCardPalette('blue', this)">Soft Blue<span class="paletteSwatch" style="background:#ffffff"></span><span class="paletteSwatch" style="background:#eff6ff"></span></button>
+      <button class="paletteOption" data-palette="green" onclick="setCardPalette('green', this)">Soft Green<span class="paletteSwatch" style="background:#ffffff"></span><span class="paletteSwatch" style="background:#f0fdf4"></span></button>
+      <button class="paletteOption" data-palette="warm" onclick="setCardPalette('warm', this)">Warm Cream<span class="paletteSwatch" style="background:#ffffff"></span><span class="paletteSwatch" style="background:#fff7ed"></span></button>
+      <button class="paletteOption" data-palette="lavender" onclick="setCardPalette('lavender', this)">Lavender<span class="paletteSwatch" style="background:#ffffff"></span><span class="paletteSwatch" style="background:#f5f3ff"></span></button>
+      <button class="paletteOption" data-palette="mint" onclick="setCardPalette('mint', this)">Mint Ice<span class="paletteSwatch" style="background:#ffffff"></span><span class="paletteSwatch" style="background:#ecfdf5"></span></button>
+      <button class="paletteOption" data-palette="sky" onclick="setCardPalette('sky', this)">Sky Mist<span class="paletteSwatch" style="background:#ffffff"></span><span class="paletteSwatch" style="background:#f0f9ff"></span></button>
+      <button class="paletteOption" data-palette="rose" onclick="setCardPalette('rose', this)">Soft Rose<span class="paletteSwatch" style="background:#ffffff"></span><span class="paletteSwatch" style="background:#fff1f2"></span></button>
+      <button class="paletteOption" data-palette="sand" onclick="setCardPalette('sand', this)">Sand Light<span class="paletteSwatch" style="background:#ffffff"></span><span class="paletteSwatch" style="background:#fafaf9"></span></button>
+      <button class="paletteOption" data-palette="grayblue" onclick="setCardPalette('grayblue', this)">Gray Blue<span class="paletteSwatch" style="background:#ffffff"></span><span class="paletteSwatch" style="background:#f1f5f9"></span></button>
+    </div>
+
+    <button class="saveBtn" onclick="savePaletteSettings()">Save</button>
+    <button class="backBtn" onclick="backToSettingsMenu('paletteSettingsModal')">Back</button>
+  </div>
+</div>
+
+<div class="modal" id="nextSettingsModal">
+  <div class="modalContent">
+    <div class="modalTitle">Next Button Position</div>
+    <div class="modalSub">Choose where the floating Next button appears.</div>
+
+    <div class="positionGrid">
+      <button class="positionBtn" data-pos="left-top" onclick="setPosition('left-top', this)">Left Top</button>
+      <button class="positionBtn" data-pos="center-top" onclick="setPosition('center-top', this)">Top</button>
+      <button class="positionBtn" data-pos="right-top" onclick="setPosition('right-top', this)">Right Top</button>
+      <button class="positionBtn" data-pos="left-center" onclick="setPosition('left-center', this)">Left</button>
+      <button class="positionBtn" data-pos="center-center" onclick="setPosition('center-center', this)">Center</button>
+      <button class="positionBtn" data-pos="right-center" onclick="setPosition('right-center', this)">Right</button>
+      <button class="positionBtn" data-pos="left-bottom" onclick="setPosition('left-bottom', this)">Left Bottom</button>
+      <button class="positionBtn" data-pos="center-bottom" onclick="setPosition('center-bottom', this)">Bottom</button>
+      <button class="positionBtn" data-pos="right-bottom" onclick="setPosition('right-bottom', this)">Right Bottom</button>
+    </div>
+
+    <button class="saveBtn" onclick="saveNextSettings()">Save</button>
+    <button class="backBtn" onclick="backToSettingsMenu('nextSettingsModal')">Back</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB5MZzbnRP4YvnjOCxWwVd5Etg4IxPkNR8",
+  authDomain: "paa-website-image-sorter.firebaseapp.com",
+  projectId: "paa-website-image-sorter",
+  storageBucket: "paa-website-image-sorter.firebasestorage.app",
+  messagingSenderId: "219784300722",
+  appId: "1:219784300722:web:9aac9ca17435fa847d21ab"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+
+// Compatibility bridge for the original Apps Script client calls.
+// It preserves google.script.run's chained success and failure handler API.
+function createServerRunner() {
+  let successHandler = function() {};
+  let failureHandler = function(error) { console.error(error); };
+
+  const runner = new Proxy({}, {
+    get: function(_, property) {
+      if (property === 'withSuccessHandler') {
+        return function(handler) {
+          successHandler = typeof handler === 'function' ? handler : successHandler;
+          return runner;
+        };
+      }
+
+      if (property === 'withFailureHandler') {
+        return function(handler) {
+          failureHandler = typeof handler === 'function' ? handler : failureHandler;
+          return runner;
+        };
+      }
+
+      return async function() {
+        const args = Array.from(arguments);
+
+        try {
+          const user = auth.currentUser;
+          if (!user) {
+            throw new Error('Sign in is required.');
+          }
+
+          const token = await user.getIdToken();
+          const response = await fetch('/api/rpc', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+              action: String(property),
+              args: args
+            })
+          });
+
+          const payload = await response.json().catch(function() { return {}; });
+          if (!response.ok) {
+            throw new Error(payload.error || 'Server request failed.');
+          }
+
+          successHandler(payload.result);
+        } catch (error) {
+          failureHandler(error);
+        }
+      };
+    }
+  });
+
+  return runner;
+}
+
+window.google = window.google || {};
+window.google.script = window.google.script || {};
+Object.defineProperty(window.google.script, 'run', {
+  configurable: false,
+  get: createServerRunner
+});
+
+let signedInEmail = '';
+let tasks = [];
+let preloadQueue = [];
+let saving = false;
+let preloading = false;
+let confirmCallback = null;
+let batchDeadlineAt = null;
+let batchTimerInterval = null;
+let autoSaveExitRunning = false;
+
+const MINUTES_PER_TASK = 2;
+
+let BATCH_SIZE = Number(localStorage.getItem('batchSize')) || 0;
+let PRELOAD_SIZE = Number(localStorage.getItem('preloadSize')) || 0;
+let BG_COLOR = localStorage.getItem('bgColor') || '#f4f6f8';
+let IMAGE_SIZE = localStorage.getItem('imageSize') || 'medium';
+let NEXT_POSITION = localStorage.getItem('nextPosition') || 'right-bottom';
+let CARD_PALETTE = localStorage.getItem('cardPalette') || 'clean';
+
+const SESSION_ID = getSessionId();
+
+function getSessionId() {
+  let id = sessionStorage.getItem('imageOrganizerSessionId');
+
+  if (!id) {
+    id = 'session_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    sessionStorage.setItem('imageOrganizerSessionId', id);
+  }
+
+  return id;
+}
+
+auth.onAuthStateChanged(user => {
+  if (user && user.email) {
+    signedInEmail = String(user.email).trim().toLowerCase();
+
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'block';
+    document.getElementById('userBox').textContent = signedInEmail;
+    document.getElementById('userAvatar').textContent = signedInEmail.charAt(0).toUpperCase();
+
+    startAppAfterLogin();
+  } else {
+    signedInEmail = '';
+    tasks = [];
+    preloadQueue = [];
+    stopBatchTimer();
+
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('appContainer').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+});
+
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  auth.signInWithPopup(provider).catch(error => {
+    alert('Sign in failed: ' + error.message);
+  });
+}
+
+function signOutUser() {
+  if (tasks.length > 0) {
+    saveExitAfterConfirm();
+  }
+
+  auth.signOut();
+}
+
+function startAppAfterLogin() {
+  applyBackground();
+  applyImageSize();
+  applyNextButtonPosition();
+  applyCardPalette();
+  openLoadPrompt();
+}
+
+function requireSignedInEmail() {
+  if (!signedInEmail) {
+    alert('Please sign in first.');
+    return false;
+  }
+
+  return true;
+}
+
+function startBatchTimer(taskCount) {
+  stopBatchTimer();
+
+  const count = Number(taskCount || tasks.length || BATCH_SIZE || 0);
+
+  if (!(count > 0)) {
+    return;
+  }
+
+  const durationMs = count * MINUTES_PER_TASK * 60 * 1000;
+
+  batchDeadlineAt = Date.now() + durationMs;
+
+  updateBatchTimer();
+
+  batchTimerInterval = setInterval(updateBatchTimer, 1000);
+}
+
+function stopBatchTimer() {
+  if (batchTimerInterval) {
+    clearInterval(batchTimerInterval);
+    batchTimerInterval = null;
+  }
+
+  batchDeadlineAt = null;
+
+  const timer = document.getElementById('batchTimer');
+
+  if (timer) {
+    timer.style.display = 'none';
+    timer.textContent = '';
+    timer.className = 'batchTimer';
+  }
+}
+
+function updateBatchTimer() {
+  const timer = document.getElementById('batchTimer');
+
+  if (!timer || !batchDeadlineAt) {
+    return;
+  }
+
+  const remainingMs = batchDeadlineAt - Date.now();
+
+  if (remainingMs <= 0) {
+    timer.textContent = 'Time expired. Auto saving and exiting now...';
+    timer.className = 'batchTimer danger';
+    autoSaveExitBatch();
+    return;
+  }
+
+  const totalSeconds = Math.ceil(remainingMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  timer.style.display = 'block';
+  timer.textContent =
+    'Batch expires in ' +
+    minutes +
+    ':' +
+    String(seconds).padStart(2, '0') +
+    ' | Auto save exit will record answered tasks and release unanswered tasks';
+
+  if (remainingMs <= 2 * 60 * 1000) {
+    timer.className = 'batchTimer danger';
+  } else if (remainingMs <= 5 * 60 * 1000) {
+    timer.className = 'batchTimer warning';
+  } else {
+    timer.className = 'batchTimer';
+  }
+}
+
+function autoSaveExitBatch() {
+  if (autoSaveExitRunning || saving) {
+    return;
+  }
+
+  autoSaveExitRunning = true;
+  stopBatchTimer();
+
+  saving = true;
+  document.body.classList.add('loading');
+
+  const results = tasks.map(task => ({
+    rowNumber: task.rowNumber,
+    sku: task.sku,
+    selectedImages: task.selectedImages,
+    skipped: task.skipped
+  }));
+
+  google.script.run
+    .withSuccessHandler(() => {
+      google.script.run
+        .withSuccessHandler(() => {
+          document.body.classList.remove('loading');
+          saving = false;
+          autoSaveExitRunning = false;
+          resetToStartScreen();
+          alert('This batch expired and was automatically saved. Answered tasks were recorded and unanswered tasks were released.');
+        })
+        .withFailureHandler(err => {
+          document.body.classList.remove('loading');
+          saving = false;
+          autoSaveExitRunning = false;
+          alert('Auto release failed: ' + err.message);
+        })
+        .releaseSessionLocks(SESSION_ID, signedInEmail);
+    })
+    .withFailureHandler(err => {
+      document.body.classList.remove('loading');
+      saving = false;
+      autoSaveExitRunning = false;
+      alert('Auto save exit failed: ' + err.message);
+    })
+    .saveBatchResults({
+      sessionId: SESSION_ID,
+      workerEmail: signedInEmail,
+      results: results
+    });
+}
+
+function showConfirm(type, title, message, confirmText, callback) {
+  confirmCallback = callback;
+
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMessage').textContent = message;
+  document.getElementById('confirmIcon').textContent = type === 'exit' ? '✓' : '↻';
+
+  const btn = document.getElementById('confirmActionBtn');
+  btn.textContent = confirmText;
+  btn.className = type === 'exit' ? 'confirmGo exit' : 'confirmGo';
+  btn.onclick = runConfirmAction;
+
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+
+function closeConfirm() {
+  confirmCallback = null;
+  document.getElementById('confirmModal').style.display = 'none';
+}
+
+function runConfirmAction() {
+  const action = confirmCallback;
+  closeConfirm();
+
+  if (typeof action === 'function') {
+    action();
+  }
+}
+
+function confirmRefresh() {
+  showConfirm(
+    'refresh',
+    'Refresh and release tasks?',
+    'This will release the currently loaded and preloaded tasks from this session, then return to the Load Tasks screen.',
+    'Refresh',
+    refreshAfterConfirm
+  );
+}
+
+function confirmSaveExit() {
+  showConfirm(
+    'exit',
+    'Save and exit?',
+    'This will save your current selections, release any remaining preloaded tasks, and return to the Load Tasks screen.',
+    'Save Exit',
+    saveExitAfterConfirm
+  );
+}
+
+function resetToStartScreen() {
+  stopBatchTimer();
+
+  tasks = [];
+  preloadQueue = [];
+  preloading = false;
+  saving = false;
+
+  document.getElementById('taskList').innerHTML = '';
+  document.getElementById('status').textContent = '';
+
+  openLoadPrompt();
+}
+
+function releaseCurrentSessionLocksThen(callback) {
+  if (!requireSignedInEmail()) {
+    return;
+  }
+
+  stopBatchTimer();
+
+  document.body.classList.add('loading');
+
+  google.script.run
+    .withSuccessHandler(() => {
+      document.body.classList.remove('loading');
+
+      if (typeof callback === 'function') {
+        callback();
+      }
+    })
+    .withFailureHandler(err => {
+      document.body.classList.remove('loading');
+      alert('Release failed: ' + err.message);
+    })
+    .releaseSessionLocks(SESSION_ID, signedInEmail);
+}
+
+function refreshAfterConfirm() {
+  releaseCurrentSessionLocksThen(resetToStartScreen);
+}
+
+function saveExitAfterConfirm() {
+  if (saving || !requireSignedInEmail()) {
+    return;
+  }
+
+  stopBatchTimer();
+
+  saving = true;
+  document.body.classList.add('loading');
+
+  const results = tasks.map(task => ({
+    rowNumber: task.rowNumber,
+    sku: task.sku,
+    selectedImages: task.selectedImages,
+    skipped: task.skipped
+  }));
+
+  google.script.run
+    .withSuccessHandler(() => {
+      google.script.run
+        .withSuccessHandler(() => {
+          document.body.classList.remove('loading');
+          saving = false;
+          resetToStartScreen();
+        })
+        .withFailureHandler(err => {
+          document.body.classList.remove('loading');
+          saving = false;
+          alert('Exit release failed: ' + err.message);
+        })
+        .releaseSessionLocks(SESSION_ID, signedInEmail);
+    })
+    .withFailureHandler(err => {
+      document.body.classList.remove('loading');
+      saving = false;
+      alert('Save exit failed: ' + err.message);
+    })
+    .saveBatchResults({
+      sessionId: SESSION_ID,
+      workerEmail: signedInEmail,
+      results: results
+    });
+}
+
+function openLoadPrompt() {
+  if (saving) {
+    return;
+  }
+
+  document.getElementById('loadCountInput').value = BATCH_SIZE > 0 ? BATCH_SIZE : '';
+  document.getElementById('preloadCountInput').value = PRELOAD_SIZE > 0 ? PRELOAD_SIZE : '';
+  document.getElementById('loadModal').style.display = 'flex';
+
+  validateLoadInputs();
+}
+
+function validateLoadInputs() {
+  const loadValue = Number(document.getElementById('loadCountInput').value);
+  const preloadValue = Number(document.getElementById('preloadCountInput').value);
+
+  document.getElementById('loadStartBtn').disabled = !(loadValue > 0 && preloadValue > 0);
+}
+
+function confirmLoadPrompt() {
+  if (!requireSignedInEmail()) {
+    return;
+  }
+
+  const loadValue = Number(document.getElementById('loadCountInput').value);
+  const preloadValue = Number(document.getElementById('preloadCountInput').value);
+
+  if (!(loadValue > 0 && preloadValue > 0)) {
+    return;
+  }
+
+  BATCH_SIZE = loadValue;
+  PRELOAD_SIZE = preloadValue;
+
+  localStorage.setItem('batchSize', BATCH_SIZE);
+  localStorage.setItem('preloadSize', PRELOAD_SIZE);
+
+  document.getElementById('loadModal').style.display = 'none';
+
+  loadInitialTasks();
+}
+
+function openSettings() {
+  loadSettingsUI();
+  document.getElementById('settingsModal').style.display = 'flex';
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').style.display = 'none';
+}
+
+function openSettingsPanel(panelId) {
+  closeAllSettingsPanels();
+  document.getElementById('settingsModal').style.display = 'none';
+  document.getElementById(panelId).style.display = 'flex';
+  loadSettingsUI();
+}
+
+function backToSettingsMenu(panelId) {
+  document.getElementById(panelId).style.display = 'none';
+  document.getElementById('settingsModal').style.display = 'flex';
+}
+
+function closeAllSettingsPanels() {
+  const panels = [
+    'taskSettingsModal',
+    'backgroundSettingsModal',
+    'imageSettingsModal',
+    'paletteSettingsModal',
+    'nextSettingsModal'
+  ];
+
+  panels.forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+}
+
+function applyBackground() {
+  document.documentElement.style.setProperty('--bgColor', BG_COLOR);
+
+  const preview = document.getElementById('colorPreview');
+
+  if (preview) {
+    preview.style.background = BG_COLOR;
+  }
+}
+
+function chooseColor(color, btn) {
+  BG_COLOR = color;
+
+  const custom = document.getElementById('customColorInput');
+
+  if (custom) {
+    custom.value = color;
+  }
+
+  document.querySelectorAll('.swatch').forEach(item => item.classList.remove('active'));
+
+  if (btn) {
+    btn.classList.add('active');
+  }
+
+  applyBackground();
+}
+
+function handleCustomColorInput() {
+  const value = document.getElementById('customColorInput').value.trim();
+
+  if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+    BG_COLOR = value;
+    document.querySelectorAll('.swatch').forEach(item => item.classList.remove('active'));
+    applyBackground();
+  }
+}
+
+function applyImageSize() {
+  const root = document.documentElement;
+
+  switch (IMAGE_SIZE) {
+    case 'tiny':
+      root.style.setProperty('--imageWidth', '80px');
+      root.style.setProperty('--imageHeight', '50px');
+      break;
+    case 'small':
+      root.style.setProperty('--imageWidth', '100px');
+      root.style.setProperty('--imageHeight', '60px');
+      break;
+    case 'large':
+      root.style.setProperty('--imageWidth', '170px');
+      root.style.setProperty('--imageHeight', '110px');
+      break;
+    case 'xlarge':
+      root.style.setProperty('--imageWidth', '230px');
+      root.style.setProperty('--imageHeight', '150px');
+      break;
+    default:
+      root.style.setProperty('--imageWidth', '120px');
+      root.style.setProperty('--imageHeight', '70px');
+  }
+}
+
+function applyCardPalette() {
+  const root = document.documentElement;
+
+  const palettes = {
+    clean: ['#ffffff', '#f8fafc'],
+    blue: ['#ffffff', '#eff6ff'],
+    green: ['#ffffff', '#f0fdf4'],
+    warm: ['#ffffff', '#fff7ed'],
+    lavender: ['#ffffff', '#f5f3ff'],
+    mint: ['#ffffff', '#ecfdf5'],
+    sky: ['#ffffff', '#f0f9ff'],
+    rose: ['#ffffff', '#fff1f2'],
+    sand: ['#ffffff', '#fafaf9'],
+    grayblue: ['#ffffff', '#f1f5f9']
+  };
+
+  const selected = palettes[CARD_PALETTE] || palettes.clean;
+
+  root.style.setProperty('--cardColorOdd', selected[0]);
+  root.style.setProperty('--cardColorEven', selected[1]);
+}
+
+function setCardPalette(palette, btn) {
+  CARD_PALETTE = palette;
+
+  document.querySelectorAll('.paletteOption').forEach(item => item.classList.remove('active'));
+
+  if (btn) {
+    btn.classList.add('active');
+  }
+
+  applyCardPalette();
+}
+
+function applyNextButtonPosition() {
+  const btn = document.getElementById('nextBtn');
+
+  btn.style.left = '';
+  btn.style.right = '';
+  btn.style.top = '';
+  btn.style.bottom = '';
+  btn.style.transform = '';
+
+  const edge = '22px';
+  const topSafe = '92px';
+
+  switch (NEXT_POSITION) {
+    case 'left-top':
+      btn.style.left = edge;
+      btn.style.top = topSafe;
+      break;
+    case 'center-top':
+      btn.style.left = '50%';
+      btn.style.top = topSafe;
+      btn.style.transform = 'translateX(-50%)';
+      break;
+    case 'right-top':
+      btn.style.right = edge;
+      btn.style.top = topSafe;
+      break;
+    case 'left-center':
+      btn.style.left = edge;
+      btn.style.top = '50%';
+      btn.style.transform = 'translateY(-50%)';
+      break;
+    case 'center-center':
+      btn.style.left = '50%';
+      btn.style.top = '50%';
+      btn.style.transform = 'translate(-50%, -50%)';
+      break;
+    case 'right-center':
+      btn.style.right = edge;
+      btn.style.top = '50%';
+      btn.style.transform = 'translateY(-50%)';
+      break;
+    case 'left-bottom':
+      btn.style.left = edge;
+      btn.style.bottom = edge;
+      break;
+    case 'center-bottom':
+      btn.style.left = '50%';
+      btn.style.bottom = edge;
+      btn.style.transform = 'translateX(-50%)';
+      break;
+    case 'right-bottom':
+      btn.style.right = edge;
+      btn.style.bottom = edge;
+      break;
+  }
+}
+
+function setPosition(pos, btn) {
+  NEXT_POSITION = pos;
+
+  document.querySelectorAll('.positionBtn').forEach(item => item.classList.remove('active'));
+
+  if (btn) {
+    btn.classList.add('active');
+  }
+
+  applyNextButtonPosition();
+}
+
+function saveTaskSettings() {
+  BATCH_SIZE = Number(document.getElementById('batchSizeSelect').value) || BATCH_SIZE;
+  PRELOAD_SIZE = Number(document.getElementById('preloadSizeSelect').value) || PRELOAD_SIZE;
+
+  localStorage.setItem('batchSize', BATCH_SIZE);
+  localStorage.setItem('preloadSize', PRELOAD_SIZE);
+
+  backToSettingsMenu('taskSettingsModal');
+}
+
+function saveBackgroundSettings() {
+  localStorage.setItem('bgColor', BG_COLOR);
+  applyBackground();
+  backToSettingsMenu('backgroundSettingsModal');
+}
+
+function saveImageSettings() {
+  IMAGE_SIZE = document.getElementById('imageSizeSelect').value;
+
+  localStorage.setItem('imageSize', IMAGE_SIZE);
+
+  applyImageSize();
+
+  backToSettingsMenu('imageSettingsModal');
+}
+
+function savePaletteSettings() {
+  localStorage.setItem('cardPalette', CARD_PALETTE);
+
+  applyCardPalette();
+
+  backToSettingsMenu('paletteSettingsModal');
+}
+
+function saveNextSettings() {
+  localStorage.setItem('nextPosition', NEXT_POSITION);
+
+  applyNextButtonPosition();
+
+  backToSettingsMenu('nextSettingsModal');
+}
+
+function loadSettingsUI() {
+  const batchSelect = document.getElementById('batchSizeSelect');
+  const preloadSelect = document.getElementById('preloadSizeSelect');
+  const customColor = document.getElementById('customColorInput');
+  const imageSelect = document.getElementById('imageSizeSelect');
+
+  if (batchSelect) {
+    batchSelect.value = String(BATCH_SIZE || 10);
+  }
+
+  if (preloadSelect) {
+    preloadSelect.value = String(PRELOAD_SIZE || 10);
+  }
+
+  if (customColor) {
+    customColor.value = BG_COLOR;
+  }
+
+  if (imageSelect) {
+    imageSelect.value = IMAGE_SIZE;
+  }
+
+  applyBackground();
+  applyCardPalette();
+
+  document.querySelectorAll('.positionBtn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.pos === NEXT_POSITION);
+  });
+
+  document.querySelectorAll('.paletteOption').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.palette === CARD_PALETTE);
+  });
+}
+
+function normalizeTasks(data) {
+  return (data || []).map(task => ({
+    rowNumber: task.rowNumber,
+    sku: task.sku,
+    description: task.description || '',
+    images: task.images || [],
+    selectedImages: [],
+    skipped: false
+  }));
+}
+
+function loadInitialTasks() {
+  if (!requireSignedInEmail()) {
+    return;
+  }
+
+  document.body.classList.add('loading');
+
+  google.script.run
+    .withSuccessHandler(data => {
+      tasks = normalizeTasks(data);
+      preloadQueue = [];
+      document.body.classList.remove('loading');
+      renderTasks();
+      scrollToTopNow();
+
+      if (tasks.length > 0) {
+        startBatchTimer(tasks.length);
+      } else {
+        stopBatchTimer();
+      }
+
+      preloadNextTasks();
+    })
+    .withFailureHandler(err => {
+      document.body.classList.remove('loading');
+      stopBatchTimer();
+      alert('Load failed: ' + err.message);
+    })
+    .getNextBatch(BATCH_SIZE, SESSION_ID, signedInEmail);
+}
+
+function preloadNextTasks() {
+  if (!requireSignedInEmail()) {
+    return;
+  }
+
+  if (preloading) {
+    return;
+  }
+
+  if (preloadQueue.length >= PRELOAD_SIZE) {
+    return;
+  }
+
+  preloading = true;
+  updateStatus();
+
+  const needed = Math.max(PRELOAD_SIZE - preloadQueue.length, BATCH_SIZE);
+
+  google.script.run
+    .withSuccessHandler(data => {
+      const loaded = normalizeTasks(data);
+      preloadQueue = preloadQueue.concat(loaded);
+      preloading = false;
+      warmImages(preloadQueue);
+      updateStatus();
+    })
+    .withFailureHandler(() => {
+      preloading = false;
+      updateStatus();
+    })
+    .getNextBatch(needed, SESSION_ID, signedInEmail);
+}
+
+function warmImages(batch) {
+  batch.forEach(task => {
+    task.images.forEach(url => {
+      const img = new Image();
+      img.src = url;
+    });
+  });
+}
+
+function usePreloadedBatch() {
+  tasks = preloadQueue.splice(0, BATCH_SIZE);
+  renderTasks();
+  scrollToTopNow();
+
+  if (tasks.length > 0) {
+    startBatchTimer(tasks.length);
+  } else {
+    stopBatchTimer();
+  }
+
+  preloadNextTasks();
+}
+
+function scrollToTopNow() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+function updateStatus() {
+  const status = document.getElementById('status');
+
+  if (!tasks.length) {
+    status.textContent = '';
+    return;
+  }
+
+  let text = tasks.length + ' task(s) loaded';
+
+  if (preloading) {
+    text += ' | preparing preload';
+  } else if (preloadQueue.length > 0) {
+    text += ' | ' + preloadQueue.length + ' preloaded';
+  }
+
+  status.textContent = text;
+}
+
+function renderTasks() {
+  const wrap = document.getElementById('taskList');
+
+  wrap.innerHTML = '';
+
+  if (!tasks.length) {
+    document.getElementById('status').textContent = '';
+    wrap.innerHTML = '<div class="empty">No more SKUs to review.</div>';
+    return;
+  }
+
+  updateStatus();
+
+  tasks.forEach((task, taskIndex) => {
+    const card = document.createElement('div');
+    card.className = taskIndex % 2 === 0 ? 'taskCard' : 'taskCard alt';
+
+    const descriptionHtml = task.description
+      ? ` <span class="descText">${escapeHtml(task.description)}</span>`
+      : '';
+
+    const imagesHtml = task.images.map(url => {
+      const selectedIndex = task.selectedImages.indexOf(url);
+      const isSelected = selectedIndex > -1;
+
+      return `
+        <div class="imgBox ${isSelected ? 'selected' : ''} ${task.skipped ? 'disabled' : ''}" onclick="toggleImage(${taskIndex}, '${escapeForClick(url)}')">
+          ${isSelected ? `<div class="badge">${selectedIndex + 1}</div>` : ''}
+          <img src="${escapeHtml(url)}" loading="lazy">
+        </div>
+      `;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="taskTop">
+        <div class="taskNumber">${taskIndex + 1}</div>
+        <div class="skuLine">
+          <span class="skuText">${escapeHtml(task.sku)}</span>${descriptionHtml}
+        </div>
+        <button class="skipBtn ${task.skipped ? 'skipped' : ''}" onclick="toggleSkip(${taskIndex})">
+          ${task.skipped ? 'Skipped' : 'Skip'}
+        </button>
+      </div>
+
+      <div class="images">
+        ${imagesHtml}
+      </div>
+    `;
+
+    wrap.appendChild(card);
+  });
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function escapeForClick(value) {
+  return String(value)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, '');
+}
+
+function toggleImage(taskIndex, url) {
+  const task = tasks[taskIndex];
+
+  if (!task || task.skipped) {
+    return;
+  }
+
+  const index = task.selectedImages.indexOf(url);
+
+  if (index > -1) {
+    task.selectedImages.splice(index, 1);
+  } else {
+    task.selectedImages.push(url);
+  }
+
+  renderTasks();
+}
+
+function toggleSkip(taskIndex) {
+  const task = tasks[taskIndex];
+
+  if (!task) {
+    return;
+  }
+
+  task.skipped = !task.skipped;
+
+  if (task.skipped) {
+    task.selectedImages = [];
+  }
+
+  renderTasks();
+}
+
+function saveAndNext() {
+  if (saving || !tasks.length || !requireSignedInEmail()) {
+    return;
+  }
+
+  saving = true;
+  stopBatchTimer();
+  document.body.classList.add('loading');
+
+  const results = tasks.map(task => ({
+    rowNumber: task.rowNumber,
+    sku: task.sku,
+    selectedImages: task.selectedImages,
+    skipped: task.skipped
+  }));
+
+  google.script.run
+    .withSuccessHandler(() => {
+      saving = false;
+      document.body.classList.remove('loading');
+
+      if (preloadQueue.length > 0) {
+        usePreloadedBatch();
+      } else {
+        loadInitialTasks();
+      }
+    })
+    .withFailureHandler(err => {
+      saving = false;
+      document.body.classList.remove('loading');
+      alert('Save failed: ' + simplifyError(err));
+    })
+    .saveBatchResults({
+      sessionId: SESSION_ID,
+      workerEmail: signedInEmail,
+      results: results
+    });
+}
+
+function openProgress() {
+  document.getElementById('progressModal').style.display = 'flex';
+  document.getElementById('progressSummary').textContent = 'Loading progress...';
+  document.getElementById('progressTableWrap').innerHTML = '';
+
+  google.script.run
+    .withSuccessHandler(renderProgress)
+    .withFailureHandler(err => {
+      document.getElementById('progressSummary').textContent =
+        'Failed to load progress: ' + simplifyError(err);
+    })
+    .getProgressReport();
+}
+
+function closeProgress() {
+  document.getElementById('progressModal').style.display = 'none';
+}
+
+function renderProgress(summary) {
+  const totalSkus = summary.totalSkus || 37892;
+  const completed = summary.totalCompletedUniqueSkus || 0;
+  const overallPercent = summary.overallCompletionPercent || 0;
+  const users = summary.users || [];
+
+  document.getElementById('progressSummary').textContent =
+    'Grand total completed: ' +
+    completed.toLocaleString() +
+    ' of ' +
+    totalSkus.toLocaleString() +
+    ' SKUs | Overall completion: ' +
+    overallPercent.toFixed(2) +
+    '%';
+
+  if (!users.length) {
+    document.getElementById('progressTableWrap').innerHTML =
+      '<div class="empty">No completed tasks yet.</div>';
+    return;
+  }
+
+  const rows = users.map(user => {
+    const name = user.alias || user.displayName || user.email;
+
+    return `
+      <tr>
+        <td>${escapeHtml(name)}</td>
+        <td class="num">${Number(user.uniqueSkuCount || 0).toLocaleString()}</td>
+        <td class="num">${Number(user.contributionPercent || 0).toFixed(2)}%</td>
+      </tr>
+    `;
+  }).join('');
+
+  document.getElementById('progressTableWrap').innerHTML = `
+    <table class="progressTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th class="num">Tasks Completed</th>
+          <th class="num">% Completed</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  `;
+}
+
+function exportCsv() {
+  document.body.classList.add('loading');
+
+  google.script.run
+    .withSuccessHandler(csvText => {
+      document.body.classList.remove('loading');
+
+      const blob = new Blob([csvText], {
+        type: 'text/csv;charset=utf-8;'
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+
+      const now = new Date();
+      const stamp =
+        now.getFullYear() +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0') +
+        '_' +
+        String(now.getHours()).padStart(2, '0') +
+        String(now.getMinutes()).padStart(2, '0');
+
+      a.href = url;
+      a.download = 'firebase_import_export_' + stamp + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    })
+    .withFailureHandler(err => {
+      document.body.classList.remove('loading');
+      alert('Export failed: ' + simplifyError(err));
+    })
+    .exportCompletedTasksCsv();
+}
+
+function simplifyError(err) {
+  const message = String((err && err.message) || err || '');
+
+  if (
+    message.indexOf('RESOURCE_EXHAUSTED') > -1 ||
+    message.indexOf('Quota exceeded') > -1 ||
+    message.indexOf('code":429') > -1
+  ) {
+    return 'Firebase daily quota has been reached. Please try again tomorrow, or upgrade Firebase to Blaze to continue today.';
+  }
+
+  return message;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const loadModalOpen = document.getElementById('loadModal').style.display === 'flex';
+    const confirmModalOpen = document.getElementById('confirmModal').style.display === 'flex';
+    const progressModalOpen = document.getElementById('progressModal').style.display === 'flex';
+
+    if (progressModalOpen) {
+      closeProgress();
+    } else if (confirmModalOpen) {
+      runConfirmAction();
+    } else if (loadModalOpen) {
+      confirmLoadPrompt();
+    } else {
+      saveAndNext();
+    }
+  }
+});
+</script>
+
+</body>
+</html>
